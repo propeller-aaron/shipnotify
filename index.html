@@ -484,7 +484,7 @@
         // Carrier tracking URLs
         const carrierUrls = {
             fedex: (tracking) => `https://www.fedex.com/fedextrack/?trknbr=${encodeURIComponent(tracking)}`,
-            usps: (tracking) => `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(tracking)}`,
+            usps: (tracking) => `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(tracking)}`,
             ups: (tracking) => `https://www.ups.com/track?tracknum=${encodeURIComponent(tracking)}`,
             dhl: (tracking) => `https://www.dhl.com/en/express/tracking.html?AWB=${encodeURIComponent(tracking)}`
         };
