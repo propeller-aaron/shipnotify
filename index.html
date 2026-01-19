@@ -20,6 +20,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            padding-bottom: 100px;
         }
 
         .container {
@@ -135,12 +136,62 @@
             display: block;
         }
 
+        .redirect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 80px);
+            background: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 80px;
+        }
+
+        .redirect-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #0d3c55;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .redirect-message {
+            color: #0d3c55;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .container.hide-content {
+            display: none;
+        }
+
         .footer {
-            margin-top: 30px;
-            padding-top: 20px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: white;
             border-top: 1px solid #e0e0e0;
             color: #999;
             font-size: 0.9em;
+            text-align: center;
+            z-index: 1001;
         }
 
         .footer a {
@@ -183,15 +234,49 @@
             background: #f0f7fa;
             border-left: 4px solid #0d3c55;
             border-radius: 8px;
-            padding: 20px;
             margin-top: 30px;
             text-align: left;
+            overflow: hidden;
         }
 
-        .instructions h3 {
+        .instructions-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .instructions-header:hover {
+            background-color: #e8f0f3;
+        }
+
+        .instructions-header h3 {
             color: #0d3c55;
-            margin-bottom: 15px;
+            margin: 0;
             font-size: 1.1em;
+        }
+
+        .instructions-toggle {
+            color: #0d3c55;
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+
+        .instructions-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .instructions-content.expanded {
+            max-height: 1000px;
+        }
+
+        .instructions-content-inner {
+            padding: 0 20px 20px 20px;
         }
 
         .instructions p {
@@ -250,29 +335,32 @@
         <div class="loading" id="loadingMessage">Redirecting to carrier...</div>
 
         <div class="instructions">
-            <h3>📋 Direct Redirect Instructions</h3>
-            <p>You can use this page as a direct carrier redirect by including a tracking number in the URL. This is perfect for email links and automated notifications.</p>
-            
-            <p><strong>URL Format:</strong></p>
-            <ul>
-                <li><code>https://shipnotify.top?tracking=TRACKING_NUMBER</code></li>
-                <li><code>https://shipnotify.top?track=TRACKING_NUMBER</code></li>
-                <li><code>https://shipnotify.top?tn=TRACKING_NUMBER</code></li>
-            </ul>
+            <div class="instructions-header" onclick="toggleInstructions()">
+                <h3>📋 Direct Redirect Instructions</h3>
+                <span class="instructions-toggle" id="instructionsToggle">▼</span>
+            </div>
+            <div class="instructions-content" id="instructionsContent">
+                <div class="instructions-content-inner">
+                    <p>You can use this page as a direct carrier redirect by including a tracking number in the URL. This is perfect for email links and automated notifications.</p>
+                    
+                    <p><strong>URL Format:</strong></p>
+                    <p><code>https://shipnotify.top?tn=TRACKING_NUMBER</code></p>
 
-            <p><strong>Examples:</strong></p>
-            <ul>
-                <li>UPS: <code>https://shipnotify.top?tracking=1Z999AA10123456784</code></li>
-                <li>USPS: <code>https://shipnotify.top?tracking=9400111899223197428497</code></li>
-                <li>FedEx: <code>https://shipnotify.top?tracking=123456789012</code></li>
-                <li>DHL: <code>https://shipnotify.top?tracking=1234567890</code></li>
-            </ul>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>UPS: <code>https://shipnotify.top?tn=1Z999AA10123456784</code></li>
+                        <li>USPS: <code>https://shipnotify.top?tn=9400111899223197428497</code></li>
+                        <li>FedEx: <code>https://shipnotify.top?tn=123456789012</code></li>
+                        <li>DHL: <code>https://shipnotify.top?tn=1234567890</code></li>
+                    </ul>
 
-            <p><strong>How it works:</strong> When a tracking number is provided in the URL, the page automatically detects the carrier (FedEx, USPS, UPS, or DHL) and redirects to USPS, UPS, DHL or FedEx tracking page.</p>
+                    <p><strong>How it works:</strong> When a tracking number is provided in the URL, the page automatically detects the carrier (FedEx, USPS, UPS, or DHL) and redirects to USPS, UPS, DHL or FedEx tracking page.</p>
+                </div>
+            </div>
         </div>
 
-        <div class="footer">
-            <p>Powered by <a href="https://propellerinc.com" target="_blank" class="propeller-logo">
+    <div class="footer">
+        <p>Powered by <a href="https://propellerinc.com" target="_blank" class="propeller-logo">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="1030" height="207" viewBox="0 0 1030 207">
                     <path d="M0 0 C8.91 0 17.82 0 27 0 C33.37214121 12.50827719 39.26096626 25.18990987 45 38 C45.11593506 36.88439697 45.23187012 35.76879395 45.35131836 34.61938477 C45.78112818 30.49472549 46.2167018 26.37069209 46.65405273 22.24682617 C46.84281094 20.45923228 47.02998904 18.67147082 47.21557617 16.88354492 C47.48204539 14.31904513 47.7541239 11.75519448 48.02734375 9.19140625 C48.1508445 7.98515343 48.1508445 7.98515343 48.27684021 6.75453186 C48.88612829 1.11387171 48.88612829 1.11387171 50 0 C51.92667507 -0.08748207 53.85651861 -0.10697334 55.78515625 -0.09765625 C56.95498047 -0.09443359 58.12480469 -0.09121094 59.33007812 -0.08789062 C60.56177734 -0.07951172 61.79347656 -0.07113281 63.0625 -0.0625 C64.91584961 -0.05573242 64.91584961 -0.05573242 66.80664062 -0.04882812 C69.87114117 -0.03699608 72.93554721 -0.02051173 76 0 C76.26960089 8.60263919 75.42806406 17.06272197 74.5390625 25.60546875 C74.38665248 27.0989573 74.23450685 28.59247285 74.08261108 30.08601379 C73.76483092 33.19856978 73.4432948 36.31070903 73.11914062 39.42260742 C72.70564596 43.39592914 72.30253183 47.3702258 71.90232277 51.3449049 C71.59110323 54.42270011 71.2739271 57.49985988 70.95502853 60.57686806 C70.80400485 62.04178466 70.65490527 63.50690103 70.50783157 64.97221947 C70.30120699 67.02277497 70.08642594 69.07232446 69.86962891 71.12182617 C69.68975937 72.86528572 69.68975937 72.86528572 69.5062561 74.64396667 C69 78 69 78 67 85 C58.09 85 49.18 85 40 85 C33.81786613 72.75021622 27.86263007 60.40561475 22 48 C21.91959473 48.65895264 21.83918945 49.31790527 21.75634766 49.99682617 C20.3247457 61.69164587 18.89002208 73.36909492 17 85 C8.42 85 -0.16 85 -9 85 C-10.03001594 80.87993624 -9.85596306 77.67684839 -9.41088867 73.54101562 C-9.33621872 72.79583176 -9.26154877 72.05064789 -9.18461609 71.28288269 C-8.93615002 68.82322357 -8.6774325 66.36477155 -8.41796875 63.90625 C-8.24158294 62.19523016 -8.0655885 60.48416994 -7.88996887 58.77307129 C-7.52036544 55.18822413 -7.1456173 51.60396081 -6.76733398 48.02001953 C-6.28308868 43.42767344 -5.81222558 38.83407082 -5.34528637 34.23993683 C-4.98457179 30.70661619 -4.61646308 27.17409569 -4.24614906 23.64176941 C-4.06957649 21.94834189 -3.89537585 20.25466531 -3.72359276 18.56074524 C-3.48237686 16.19262657 -3.23115227 13.82577671 -2.97729492 11.45898438 C-2.90810852 10.75964279 -2.83892212 10.06030121 -2.76763916 9.33976746 C-2.35718251 5.62247715 -1.71573447 3.43146894 0 0 Z M20 41 C21 43 21 43 21 43 Z " fill="#236C92" transform="translate(877,121)"/>
                     <path d="M0 0 C7.67798373 5.49798478 12.21481787 13.04045591 14.1875 22.25 C15.94776315 37.29533937 12.55140425 51.38203882 3.44140625 63.58984375 C-4.49656416 73.18887839 -15.32784121 79.03582232 -27.77734375 80.47753906 C-39.08113899 81.33996874 -49.81962424 79.64414229 -58.8125 72.25 C-64.7435503 66.59751175 -68.41477479 61.09340619 -70.8125 53.25 C-71.00199219 52.64414063 -71.19148438 52.03828125 -71.38671875 51.4140625 C-73.87560065 38.76414897 -71.44059414 26.17400766 -64.98046875 15.11328125 C-49.91515331 -6.66753969 -23.00863551 -13.96544046 0 0 Z M-40.0625 26.625 C-43.40755863 31.64258794 -44.43255363 36.25614829 -43.8125 42.25 C-42.42954084 46.30169657 -40.77622724 49.39335356 -37.5625 52.25 C-33.19713812 53.83740432 -29.22715566 54.15916185 -24.8828125 52.5234375 C-19.82467132 49.85325997 -16.8606817 46.60840883 -14.5625 41.4375 C-13.33552509 36.22285663 -13.14728754 32.07058147 -15 27 C-17.10267267 23.80973802 -18.44792091 22.11125652 -21.8125 20.25 C-29.74767678 18.94958641 -34.52035755 20.77496075 -40.0625 26.625 Z " fill="#236C92" transform="translate(402.8125,126.75)"/>
@@ -297,7 +385,11 @@
                     <path d="M0 0 C12.26675189 3.51266808 24.47068449 13.79165417 31.0625 24.625 C33.11723581 28.62892012 33.47306142 31.55322261 33 36 C29.62733714 34.50617216 27.15902184 32.52814589 24.375 30.125 C19.49001787 26.17422613 14.95170512 23.90182874 9 22 C7.83855469 21.62875 6.67710938 21.2575 5.48046875 20.875 C2.32725513 19.89111536 -0.83160209 18.93363449 -4 18 C-3.52450066 15.37428665 -3.04477433 12.7494696 -2.5625 10.125 C-2.42779297 9.37863281 -2.29308594 8.63226563 -2.15429688 7.86328125 C-1.11328125 2.2265625 -1.11328125 2.2265625 0 0 Z " fill="#236C92" transform="translate(111,69)"/>
                 </svg>
             </a></p>
-        </div>
+    </div>
+
+    <div class="redirect-overlay" id="redirectOverlay">
+        <div class="spinner"></div>
+        <div class="redirect-message">Redirecting to carrier...</div>
     </div>
 
     <script>
@@ -397,27 +489,45 @@
         /**
          * Redirect to carrier tracking page
          */
-        function redirectToCarrier(trackingNumber) {
+        function redirectToCarrier(trackingNumber, isAutoRedirect = false) {
             const carrier = detectCarrier(trackingNumber);
             const errorDiv = document.getElementById('errorMessage');
             const loadingDiv = document.getElementById('loadingMessage');
+            const container = document.querySelector('.container');
+            const overlay = document.getElementById('redirectOverlay');
 
             if (!carrier) {
+                if (isAutoRedirect) {
+                    // If auto-redirect fails, show the page normally
+                    return;
+                }
                 errorDiv.textContent = 'Unable to determine carrier. Please check your tracking number or visit the carrier\'s website directly.';
                 errorDiv.classList.add('show');
                 loadingDiv.classList.remove('show');
                 return;
             }
 
-            errorDiv.classList.remove('show');
-            loadingDiv.classList.add('show');
-
             const url = carrierUrls[carrier](trackingNumber);
             
-            // Small delay to show loading message
-            setTimeout(() => {
-                window.location.href = url;
-            }, 500);
+            if (isAutoRedirect) {
+                // Hide container and show overlay with spinner
+                container.style.display = 'none';
+                overlay.classList.add('show');
+                
+                // Wait 2 seconds before redirecting
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 2000);
+            } else {
+                // Form submission - show loading message
+                errorDiv.classList.remove('show');
+                loadingDiv.classList.add('show');
+                
+                // Small delay to show loading message
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 500);
+            }
         }
 
         /**
@@ -441,14 +551,25 @@
          */
         function checkUrlParameters() {
             const urlParams = new URLSearchParams(window.location.search);
-            const trackingNumber = urlParams.get('tracking') || urlParams.get('track') || urlParams.get('tn');
+            const trackingNumber = urlParams.get('tn');
             
             if (trackingNumber) {
                 // Set the input value
                 document.getElementById('trackingNumber').value = trackingNumber;
-                // Auto-redirect
-                redirectToCarrier(trackingNumber);
+                // Auto-redirect with flag to show overlay
+                redirectToCarrier(trackingNumber, true);
             }
+        }
+
+        /**
+         * Toggle instructions section
+         */
+        function toggleInstructions() {
+            const content = document.getElementById('instructionsContent');
+            const toggle = document.getElementById('instructionsToggle');
+            
+            content.classList.toggle('expanded');
+            toggle.textContent = content.classList.contains('expanded') ? '▲' : '▼';
         }
 
         // Check URL parameters on page load
