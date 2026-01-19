@@ -31,6 +31,7 @@
             width: 100%;
             padding: 40px;
             text-align: center;
+            position: relative;
         }
 
         .logo {
@@ -137,18 +138,17 @@
         }
 
         .redirect-overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: calc(100% - 80px);
-            background: white;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
             z-index: 1000;
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-bottom: 80px;
         }
 
         .redirect-overlay.show {
@@ -176,8 +176,8 @@
             font-weight: 600;
         }
 
-        .container.hide-content {
-            display: none;
+        .hide-on-redirect {
+            display: none !important;
         }
 
         .footer {
@@ -510,8 +510,13 @@
             const url = carrierUrls[carrier](trackingNumber);
             
             if (isAutoRedirect) {
-                // Hide container and show overlay with spinner
-                container.style.display = 'none';
+                // Hide form and instructions, show overlay with spinner
+                const form = document.getElementById('trackingForm');
+                const instructions = document.querySelector('.instructions');
+                
+                if (form) form.classList.add('hide-on-redirect');
+                if (instructions) instructions.classList.add('hide-on-redirect');
+                
                 overlay.classList.add('show');
                 
                 // Wait 2 seconds before redirecting
