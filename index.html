@@ -511,10 +511,10 @@
             const cleanTracking = trackingNumber.replace(/\s+/g, '').toUpperCase();
 
             // Check each carrier's patterns
-            for (const [carrier, patterns] of Object.entries(carrierPatterns)) {
-                for (const pattern of patterns) {
-                    if (pattern.test(cleanTracking)) {
-                        return carrier;
+            for (const [carrierName, patternsList] of Object.entries(carrierPatterns)) {
+                for (const patternRegex of patternsList) {
+                    if (patternRegex.test(cleanTracking)) {
+                        return carrierName;
                     }
                 }
             }
