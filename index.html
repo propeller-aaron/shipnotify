@@ -551,6 +551,10 @@
          * Redirect to carrier tracking page
          */
         function redirectToCarrier(trackingNumber, isAutoRedirect = false) {
+            if (!trackingNumber || !trackingNumber.trim()) {
+                return;
+            }
+            
             const carrier = detectCarrier(trackingNumber);
             const errorDiv = document.getElementById('errorMessage');
             const loadingDiv = document.getElementById('loadingMessage');
@@ -559,16 +563,40 @@
 
             if (!carrier) {
                 if (isAutoRedirect) {
-                    // If auto-redirect fails, show the page normally
+                    // If auto-redirect fails, show error message
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Unable to determine carrier. Please check your tracking number or visit the carrier\'s website directly.';
+                        errorDiv.classList.add('show');
+                    }
                     return;
                 }
-                errorDiv.textContent = 'Unable to determine carrier. Please check your tracking number or visit the carrier\'s website directly.';
-                errorDiv.classList.add('show');
-                loadingDiv.classList.remove('show');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Unable to determine carrier. Please check your tracking number or visit the carrier\'s website directly.';
+                    errorDiv.classList.add('show');
+                }
+                if (loadingDiv) {
+                    loadingDiv.classList.remove('show');
+                }
                 return;
             }
 
+            if (!carrierUrls[carrier]) {
+                if (errorDiv) {
+                    errorDiv.textContent = 'Invalid carrier detected. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+                return;
+            }
+            
             const url = carrierUrls[carrier](trackingNumber);
+            
+            if (!url) {
+                if (errorDiv) {
+                    errorDiv.textContent = 'Failed to generate tracking URL. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+                return;
+            }
             
             if (isAutoRedirect) {
                 // Hide form and instructions, show overlay with spinner
@@ -578,16 +606,27 @@
                 if (form) form.classList.add('hide-on-redirect');
                 if (instructions) instructions.classList.add('hide-on-redirect');
                 
-                overlay.classList.add('show');
-                
-                // Wait 2 seconds before redirecting
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 2000);
+                if (overlay) {
+                    overlay.classList.add('show');
+                    
+                    // Wait 2 seconds before redirecting
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 2000);
+                } else {
+                    // Fallback if overlay doesn't exist
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 500);
+                }
             } else {
                 // Form submission - show loading message
-                errorDiv.classList.remove('show');
-                loadingDiv.classList.add('show');
+                if (errorDiv) {
+                    errorDiv.classList.remove('show');
+                }
+                if (loadingDiv) {
+                    loadingDiv.classList.add('show');
+                }
                 
                 // Small delay to show loading message
                 setTimeout(() => {
@@ -599,18 +638,30 @@
         /**
          * Handle form submission
          */
-        document.getElementById('trackingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const trackingNumber = document.getElementById('trackingNumber').value.trim();
-            
-            if (!trackingNumber) {
-                document.getElementById('errorMessage').textContent = 'Please enter a tracking number.';
-                document.getElementById('errorMessage').classList.add('show');
-                return;
-            }
+        const trackingForm = document.getElementById('trackingForm');
+        if (trackingForm) {
+            trackingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const trackingNumberInput = document.getElementById('trackingNumber');
+                const errorMessageDiv = document.getElementById('errorMessage');
+                
+                if (!trackingNumberInput) {
+                    return;
+                }
+                
+                const trackingNumber = trackingNumberInput.value.trim();
+                
+                if (!trackingNumber) {
+                    if (errorMessageDiv) {
+                        errorMessageDiv.textContent = 'Please enter a tracking number.';
+                        errorMessageDiv.classList.add('show');
+                    }
+                    return;
+                }
 
-            redirectToCarrier(trackingNumber);
-        });
+                redirectToCarrier(trackingNumber);
+            });
+        }
 
         /**
          * Check for tracking number in URL parameters
@@ -621,9 +672,15 @@
             
             if (trackingNumber) {
                 // Set the input value
-                document.getElementById('trackingNumber').value = trackingNumber;
+                const input = document.getElementById('trackingNumber');
+                if (input) {
+                    input.value = trackingNumber;
+                }
                 // Auto-redirect with flag to show overlay
-                redirectToCarrier(trackingNumber, true);
+                // Use a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    redirectToCarrier(trackingNumber.trim(), true);
+                }, 50);
             }
         }
 
